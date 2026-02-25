@@ -1,0 +1,106 @@
+{% extends 'master/base.html' %}
+
+{% block content %}
+
+<div
+  style="max-width: 500px; margin: 40px auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+  <h2 style="text-align: center; color: #333; margin-bottom: 25px;">Update Profile</h2>
+
+  <!-- Current Profile Picture Preview -->
+  <div style="text-align: center; margin-bottom: 20px;">
+    {% if user_profile and user_profile.profile_picture %}
+    <img id="preview-img" src="{{ user_profile.profile_picture.url }}" alt="Profile Picture"
+      style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 4px solid #04AA6D;">
+    {% else %}
+    <img id="preview-img" src="" alt=""
+      style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 4px solid #04AA6D; display: none;">
+    <div id="avatar-placeholder"
+      style="width: 110px; height: 110px; border-radius: 50%; background: #04AA6D; display: flex; align-items: center; justify-content: center; margin: 0 auto; font-size: 45px; color: white; font-weight: bold;">
+      {{ request.user.username|upper|first }}
+    </div>
+    {% endif %}
+    <p style="color: #888; font-size: 13px; margin-top: 8px;">Click below to change your photo</p>
+  </div>
+
+  <!-- Form -->
+  <form action="" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <!-- Profile Picture Upload -->
+    <div style="margin-bottom: 15px;">
+      <label style="display: block; font-weight: bold; color: #555; margin-bottom: 6px;">Profile Picture</label>
+      <input type="file" name="profile_picture" id="profile_picture_input" accept="image/*"
+        style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; background: #fafafa; cursor: pointer; box-sizing: border-box;">
+    </div>
+
+    <!-- Name -->
+    <div style="margin-bottom: 15px;">
+      <label style="display: block; font-weight: bold; color: #555; margin-bottom: 6px;">Full Name</label>
+      <input type="text" name="name" value="{{ profile_form.name.value|default_if_none:'' }}"
+        placeholder="Enter your full name"
+        style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
+    </div>
+
+    <!-- Age -->
+    <div style="margin-bottom: 15px;">
+      <label style="display: block; font-weight: bold; color: #555; margin-bottom: 6px;">Age (years)</label>
+      <input type="number" name="age" value="{{ profile_form.age.value|default_if_none:'' }}"
+        placeholder="Enter your age"
+        style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
+    </div>
+
+    <!-- Gender -->
+    <div style="margin-bottom: 15px;">
+      <label style="display: block; font-weight: bold; color: #555; margin-bottom: 6px;">Gender</label>
+      <select name="gender"
+        style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
+        <option value="">-- Select Gender --</option>
+        <option value="Male" {% if profile_form.gender.value=="Male" %}selected{% endif %}>Male</option>
+        <option value="Female" {% if profile_form.gender.value=="Female" %}selected{% endif %}>Female</option>
+      </select>
+    </div>
+
+    <!-- Height -->
+    <div style="margin-bottom: 15px;">
+      <label style="display: block; font-weight: bold; color: #555; margin-bottom: 6px;">Height (cm)</label>
+      <input type="number" name="height" step="0.1" value="{{ profile_form.height.value|default_if_none:'' }}"
+        placeholder="Enter your height in cm"
+        style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
+    </div>
+
+    <!-- Weight -->
+    <div style="margin-bottom: 20px;">
+      <label style="display: block; font-weight: bold; color: #555; margin-bottom: 6px;">Weight (kg)</label>
+      <input type="number" name="weight" step="0.1" value="{{ profile_form.weight.value|default_if_none:'' }}"
+        placeholder="Enter your weight in kg"
+        style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
+    </div>
+
+    <input type="submit" value="Save Profile"
+      style="width: 100%; padding: 13px; background-color: #04AA6D; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer;">
+  </form>
+
+  <div style="text-align: center; margin-top: 15px;">
+    <a href="{% url 'profile_page' %}" style="color: #04AA6D; text-decoration: none;">Back to Profile</a>
+  </div>
+</div>
+
+<!-- Live Image Preview Script -->
+<script>
+  document.getElementById('profile_picture_input').addEventListener('change', function (event) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const img = document.getElementById('preview-img');
+        const placeholder = document.getElementById('avatar-placeholder');
+        img.src = e.target.result;
+        img.style.display = 'block';
+        if (placeholder) placeholder.style.display = 'none';
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+</script>
+
+{% endblock content %}
